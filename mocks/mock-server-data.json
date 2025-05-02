@@ -1,0 +1,75 @@
+{
+  "api": {
+    "titles": [
+      "Cozy Studio Apartment in the Heart of the City",
+      "Modern Loft with Stunning City Views",
+      "Charming Cottage Retreat Near the Beach",
+      "Luxurious Penthouse with Private Rooftop Terrace",
+      "Spacious Family Home with a Beautiful Garden",
+      "Sunny Beachfront Villa with Infinity Pool",
+      "Rustic Cabin in the Woods for Nature Lovers",
+      "Elegant Townhouse with Historic Charm",
+      "Secluded Mountain Chalet for a Peaceful Escape",
+      "Quaint Tiny House with Panoramic Mountain Views"
+    ],
+    "descriptions": [
+      "Enjoy this cozy studio apartment located in the heart of the city. Perfect for solo travelers or couples looking for a convenient stay.",
+      "Experience modern luxury in this stylish loft with breathtaking city views. Ideal for urban explorers seeking a trendy accommodation.",
+      "Escape to this charming cottage retreat just a short walk from the beach. Relax and unwind in the tranquil surroundings of this cozy home.",
+      "Indulge in the ultimate luxury at this luxurious penthouse featuring a private rooftop terrace with panoramic city skyline views.",
+      "Make yourself at home in this spacious family-friendly house with a beautiful garden perfect for outdoor gatherings and activities.",
+      "Experience beachfront living at its finest in this sunny villa with an infinity pool overlooking the crystal-clear waters. Ideal for sun-seekers.",
+      "Disconnect and reconnect with nature in this rustic cabin tucked away in the woods. Ideal for those seeking a peaceful and serene getaway.",
+      "Step back in time and stay in this elegant townhouse with historic charm and modern amenities. Perfect for history enthusiasts.",
+      "Find serenity in this secluded mountain chalet surrounded by nature. Perfect for those seeking a quiet retreat away from the hustle and bustle.",
+      "Experience tiny living in this quaint tiny house with panoramic mountain views. Cozy and compact, yet filled with charm and character."
+    ],
+    "previewImages": [
+      "book.jpg",
+      "institute-book.jpg",
+      "dark-tower.jpg",
+      "shining.jpg",
+      "draft.jpg",
+      "magic.jpg"
+    ],
+    "offerImages": [
+      "image-1.jpg",
+      "image-2.jpg",
+      "image-3.jpg",
+      "image-4.jpg",
+      "image-5.jpg",
+      "image-6.jpg"
+    ],
+    "users": [
+      "John Doe",
+      "Sara Smith",
+      "Mike Johnson",
+      "Emily Brownie",
+      "Alex Parker",
+      "Lily Green",
+      "Sam Wilson",
+      "Grace Adams",
+      "Peter Mills",
+      "Anna Lee"
+    ],
+    "emails": [
+      "snow@pisem.local",
+      "president@dka.local",
+      "fish@big.local",
+      "test@pisem.local",
+      "freedom@pisem.local",
+      "rolan@pochta.local",
+      "author@mir.local",
+      "test@lost.loca",
+      "kujo-fan@story.local"
+    ],
+    "avatars": [
+      "user.jpg",
+      "photo.jpg",
+      "awesome-avatar.jpg",
+      "roland.jpg",
+      "smite.jpg",
+      "coffee.jpg"
+    ]
+  }
+}
