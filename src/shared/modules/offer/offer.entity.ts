@@ -45,7 +45,9 @@ export class OfferEntity extends defaultClasses.TimeStamps {
   @prop({
     required: true,
     default: [],
-    type: () => String
+    type: () => String,
+    minCount: [6, 'Images should be 6'],
+    maxCount: [6, 'Images should be 6']
   })
   public offerImages!: string[];
 
@@ -63,7 +65,8 @@ export class OfferEntity extends defaultClasses.TimeStamps {
 
   @prop({
     required: true,
-    min: 1, max: 5
+    min: [1, 'Min rating is 1'],
+    max: [5, 'Max rating is 5']
   })
   public rating!: number;
 
@@ -76,19 +79,22 @@ export class OfferEntity extends defaultClasses.TimeStamps {
 
   @prop({
     required: true,
-    min: 1, max: 8
+    min: [1, 'Min count of rooms is 1'],
+    max: [8, 'Max count of rooms is 8']
   })
   public roomCount!: number;
 
   @prop({
     required: true,
-    min: 1, max: 10
+    min: [1, 'Min count of guests is 1'],
+    max: [10, 'Max count of guests is 10']
   })
   public guestCount!: number;
 
   @prop({
     required: true,
-    min: 100, max: 100000
+    min: [100, 'Min price is 100'],
+    max: [100000, 'Max price is 100000']
   })
   public price!: number;
 
@@ -104,7 +110,7 @@ export class OfferEntity extends defaultClasses.TimeStamps {
     ref: UserEntity,
     required: true
   })
-  public authorId!: Ref<UserEntity>;
+  public userId!: Ref<UserEntity>;
 
   @prop({ default: 0 })
   public commentCount!: number;
