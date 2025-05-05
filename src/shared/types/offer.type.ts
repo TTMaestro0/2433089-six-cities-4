@@ -18,7 +18,7 @@ export type Offer = {
   guestCount: number;
   price: number;
   conveniences: Convenience[];
-  author: User;
+  user: User;
   commentCount: number;
   coordinates: string;
 }

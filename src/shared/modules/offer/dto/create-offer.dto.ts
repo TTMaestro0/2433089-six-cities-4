@@ -1,7 +1,7 @@
 import { AccommodationType } from '../../../types/accommodation-type.enum.js';
 import { City } from '../../../types/city.enum.js';
 
-export class CreateOfferDto{
+export class CreateOfferDto {
   public title: string;
   public description: string;
   public createdDate: Date;
@@ -16,7 +16,7 @@ export class CreateOfferDto{
   public guestCount: number;
   public price: number;
   public conveniences: string[];
-  public authorID: string;
+  public userId: string;
   public commentCount: number;
   public coordinates: string;
 }

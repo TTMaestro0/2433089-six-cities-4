@@ -9,13 +9,12 @@ export function createOffer(offerData: string): Offer {
     title, description, createdDate, city,
     previewImage, offerImages, isPremium, isFavorite,
     rating, type, roomCount, guestCount, price, conveniences,
-    firstName, lastName, email, avatar, commentCount, coordinates
+    name, email, avatar, commentCount, coordinates
   ] = offerData.replace('\n', '').split('\t');
 
-  const author: User = {
+  const user: User = {
     email,
-    firstName,
-    lastName,
+    name,
     avatar
   };
 
@@ -25,7 +24,7 @@ export function createOffer(offerData: string): Offer {
     createdDate: new Date(createdDate),
     city: city as City,
     previewImage,
-    offerImages: offerImages.split(','),
+    offerImages: offerImages.split(';'),
     isPremium: Boolean(isPremium),
     isFavorite: Boolean(isFavorite),
     rating: Number(rating),
@@ -33,9 +32,9 @@ export function createOffer(offerData: string): Offer {
     roomCount: Number.parseInt(roomCount, 10),
     guestCount: Number.parseInt(guestCount, 10),
     price: Number.parseInt(price, 10),
-    conveniences: conveniences.split(',')
+    conveniences: conveniences.split(';')
       .map((convenience) => convenience as Convenience),
-    author,
+    user: user,
     commentCount: Number.parseInt(commentCount, 10),
     coordinates
   };
