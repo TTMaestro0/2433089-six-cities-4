@@ -23,7 +23,7 @@ export class UserEntity extends defaultClasses.TimeStamps implements User {
   @prop({
     unique: true,
     required: true,
-    match: [/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/, 'Email is incorrect']
+    match: [/^.+@.+$/, 'Email is incorrect']
   })
   public email: string;
 
@@ -45,7 +45,7 @@ export class UserEntity extends defaultClasses.TimeStamps implements User {
   @prop({
     required: true,
     minlength: [6, 'Min length for password is 6'],
-    maxlength: [12, 'Max length for password is 12'],
+    //maxlength: [12, 'Max length for password is 12'], TODO: delete
   })
   private password?: string;
 
