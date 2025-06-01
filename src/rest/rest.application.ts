@@ -7,6 +7,7 @@ import { DatabaseClient } from '../shared/libs/database-client/database-client.i
 import express, { Express } from 'express';
 import { getMongoURI } from '../shared/helpers/database.js';
 import { BaseController, ExceptionFilter } from '../shared/libs/rest/index.js';
+import { AuthenticateMiddleware } from '../shared/libs/rest/middleware/authenticate.middleware.js';
 
 @injectable()
 export class RestApplication {
@@ -41,6 +42,8 @@ export class RestApplication {
       '/upload',
       express.static(this.config.get('UPLOAD_DIRECTORY'))
     );
+    const authenticateMiddleware = new AuthenticateMiddleware(this.config.get('JWT_SECRET'));
+    this.server.use(authenticateMiddleware.execute.bind(authenticateMiddleware));
   }
 
   private async _initExceptionFilters() {

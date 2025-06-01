@@ -6,6 +6,7 @@ import { inject, injectable } from 'inversify';
 import { Component } from '../../types/index.js';
 import { Logger } from '../../libs/logger/index.js';
 import { OfferEntity } from '../offer/offer.entity.js';
+import { LoginUserDto } from './dto/login-user.dto.js';
 
 @injectable()
 export class DefaultUserService implements UserService {
@@ -42,5 +43,16 @@ export class DefaultUserService implements UserService {
       return [];
     }
     return this.userModel.find({ _id: { $in: offersFavorite.favoriteOffers } });
+  }
+
+  public async verifyUser(dto: LoginUserDto, salt: string): Promise<DocumentType<UserEntity> | null> {
+    const user = await this.findByEmail(dto.email);
+    if (!user) {
+      return null;
+    }
+    if (user.verifyPassword(dto.password, salt)) {
+      return user;
+    }
+    return null;
   }
 }
