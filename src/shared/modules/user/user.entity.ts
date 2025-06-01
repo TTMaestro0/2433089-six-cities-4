@@ -32,7 +32,7 @@ export class UserEntity extends defaultClasses.TimeStamps implements User {
     default: '',
     match: [/.*\.(?:jpg|png)/, 'Avatar must be jpg or png']
   })
-  public avatar: string;
+  public avatar?: string;
 
   @prop({
     required: false,
@@ -40,9 +40,8 @@ export class UserEntity extends defaultClasses.TimeStamps implements User {
     type: () => String,
     enum: UserType
   })
-  public type: UserType;
+  public type: string;
 
-  @prop({required: true})
   public favoriteOffers!: string[];
 
   @prop({
@@ -57,6 +56,7 @@ export class UserEntity extends defaultClasses.TimeStamps implements User {
     this.email = userData.email;
     this.avatar = userData.avatar;
     this.name = userData.name;
+    this.type = userData.type;
   }
 
   public setPassword(password: string, salt: string) {

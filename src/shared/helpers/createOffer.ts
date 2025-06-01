@@ -15,7 +15,8 @@ export function createOffer(offerData: string): Offer {
   const user: User = {
     email,
     name,
-    avatar
+    avatar,
+    type
   };
 
   return {
