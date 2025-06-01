@@ -11,6 +11,8 @@ import CreateCommentDto from './dto/create-comment.dto.js';
 import { HttpError } from '../../libs/rest/errors/http-error.js';
 import { fillDTO } from '../../helpers/common.js';
 import { CommentRdo } from './rdo/comment.rdo.js';
+import { PrivateRouteMiddleware } from '../../libs/rest/middleware/private-root.middleware.js';
+import { ValidateDtoMiddleware } from '../../libs/rest/middleware/validate-dto.middleware.js';
 
 @injectable()
 export class CommentController extends BaseController {
@@ -21,11 +23,16 @@ export class CommentController extends BaseController {
   ) {
     super(logger);
     this.logger.info('Register routes for CommentController...');
-    this.addRoute({ path: '/', method: HttpMethod.Post, handler: this.create });
+    this.addRoute({
+      path: '/', method: HttpMethod.Post, handler: this.create, middlewares: [
+        new PrivateRouteMiddleware(),
+        new ValidateDtoMiddleware(CreateCommentDto),
+      ]
+    });
   }
 
   public async create(
-    { body }: Request<Record<string, unknown>, Record<string, unknown>, CreateCommentDto>,
+    {body, user}: Request<Record<string, unknown>, Record<string, unknown>, CreateCommentDto>,
     res: Response
   ): Promise<void> {
     if (!await this.offerService.exists(body.offerId)) {
@@ -35,7 +42,7 @@ export class CommentController extends BaseController {
         'CommentController'
       );
     }
-    const comment = await this.commentService.create(body);
+    const comment = await this.commentService.create({ ...body, userId: user.id });
     await this.offerService.incCommentCount(body.offerId);
     this.created(res, fillDTO(CommentRdo, comment));
   }
