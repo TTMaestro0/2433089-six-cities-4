@@ -1,0 +1,5 @@
+# Предложения
+## Получить список предложений
+GET http://localhost:4000/offers HTTP/1.1
+Content-Type: application/json
+###
