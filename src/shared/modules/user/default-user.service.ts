@@ -5,6 +5,7 @@ import { CreateUserDto } from './dto/create-user.dto.js';
 import { inject, injectable } from 'inversify';
 import { Component } from '../../types/index.js';
 import { Logger } from '../../libs/logger/index.js';
+import { OfferEntity } from '../offer/offer.entity.js';
 
 @injectable()
 export class DefaultUserService implements UserService {
@@ -33,5 +34,13 @@ export class DefaultUserService implements UserService {
       return existedUser;
     }
     return this.create(dto, salt);
+  }
+
+  public async findFavoriteOffers(userId: string): Promise<DocumentType<OfferEntity>[]> {
+    const offersFavorite = await this.userModel.findById(userId).select('favorite').exec();
+    if (offersFavorite === null) {
+      return [];
+    }
+    return this.userModel.find({ _id: { $in: offersFavorite.favoriteOffers } });
   }
 }

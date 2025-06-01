@@ -29,7 +29,7 @@ export class DefaultOfferService implements OfferService {
       .exec();
   }
 
-  public async find(count: number): Promise<DocumentType<OfferEntity>[]> {
+  public async find(count?: number): Promise<DocumentType<OfferEntity>[]> {
     const limit = count ?? DEFAULT_OFFER_COUNT;
     return this.offerModel
       .find()
@@ -58,13 +58,6 @@ export class DefaultOfferService implements OfferService {
       .sort({ createdAt: SortType.Down })
       .limit(DEFAULT_OFFER_COUNT)
       .populate('userId')
-      .exec();
-  }
-
-  public async findFavorite(): Promise<DocumentType<OfferEntity>[]> {
-    return this.offerModel
-      .find({ isFavorite: true })
-      .populate('offerId')
       .exec();
   }
 

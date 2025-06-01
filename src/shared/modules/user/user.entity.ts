@@ -42,6 +42,9 @@ export class UserEntity extends defaultClasses.TimeStamps implements User {
   })
   public type: UserType;
 
+  @prop({required: true})
+  public favoriteOffers!: string[];
+
   @prop({
     required: true,
     minlength: [6, 'Min length for password is 6'],
