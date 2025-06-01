@@ -13,7 +13,7 @@ export class CreateUserDto {
   public avatar?: string;
 
   @IsString({ message: CreateUserMessages.type.invalidFormat })
-  public userType!: string;
+  public type!: string;
 
   @IsString({ message: CreateUserMessages.password.invalidFormat })
   @Length(6, 12, { message: CreateUserMessages.password.lengthField })
