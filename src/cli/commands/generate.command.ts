@@ -1,46 +1,49 @@
 import got from 'got';
-import { Command } from './command.interface.js';
-import { MockServerData } from '../../shared/types/mock-server-data.type.js';
-import { TSVOfferGenerator } from '../../shared/libs/offer-generator/tsv-offer-generator.js';
-import { TSVFileWriter } from '../../shared/libs/file-writer/tsv-file-writer.js';
+import { getErrorMessage } from '../../shared/helpers/index.js';
+import { TsvFileWriter } from '../../shared/libs/file-writer/index.js';
+import { TsvOfferGenerator } from '../../shared/libs/offer-generator/index.js';
+import { MockServerData } from '../../shared/types/index.js';
+import { ICommand } from './command.interface.js';
 
-export class GenerateCommand implements Command {
+export class GenerateCommand implements ICommand {
   private initialData: MockServerData;
-
-  private async load(url: string): Promise<void> {
-    try {
-      this.initialData = await got.get(url).json();
-    } catch {
-      throw new Error(`Can't load data from ${url}`);
-    }
-  }
-
-  private async write(filePath: string, offerCount: number): Promise<void> {
-    const tsvOfferGenerator = new TSVOfferGenerator(this.initialData);
-    const tsvFileWriter = new TSVFileWriter(filePath);
-
-    for (let i = 0; i < offerCount; i++) {
-      await tsvFileWriter.write(tsvOfferGenerator.generate());
-    }
-  }
 
   public getName(): string {
     return '--generate';
   }
 
-  public async execute(...parameters: string[]): Promise<void> {
-    const [count, filePath, url] = parameters;
+  public async execute(...args: string[]): Promise<void> {
+    const [count, path, url] = args;
     const offerCount = Number.parseInt(count, 10);
-
     try {
       await this.load(url);
-      await this.write(filePath, offerCount);
+      await this.write(path, offerCount);
+      console.info(`File ${path} was created.`);
     } catch (error: unknown) {
       console.error('Can\'t generate data');
-
-      if (error instanceof Error) {
-        console.error(error.message);
-      }
+      console.error(`Details: ${getErrorMessage(error)}`);
     }
   }
+
+  private async load(url: string) {
+    try {
+      this.initialData = await got.get(url).json();
+    } catch (error: unknown) {
+      if (!(error instanceof Error)) {
+        throw new Error(`Can't load data from ${url}`);
+      }
+
+      throw new Error(`Can't load data from ${url}: ${error.message}`);
+    }
+  }
+
+  private async write(filepath: string, offerCount: number) {
+    const generator = new TsvOfferGenerator(this.initialData);
+    const writer = new TsvFileWriter(filepath);
+    for (let i = 0; i < offerCount; i++) {
+      const row = generator.generate();
+      await writer.write(row);
+    }
+  }
+
 }

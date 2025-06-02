@@ -1,4 +1,3 @@
-import { getErrorMessage } from '../../helpers/index.js';
 import { Logger } from './logger.interface.js';
 
 export class ConsoleLogger implements Logger {
@@ -6,9 +5,8 @@ export class ConsoleLogger implements Logger {
     console.debug(message, ...args);
   }
 
-  public error(message: string, error: Error, ...args: unknown[]): void {
+  public error(message: string, ...args: unknown[]): void {
     console.error(message, ...args);
-    console.error(`Error message: ${getErrorMessage(error)}`);
   }
 
   public info(message: string, ...args: unknown[]): void {

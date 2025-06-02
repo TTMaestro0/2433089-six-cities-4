@@ -5,6 +5,7 @@ import { Controller } from './controller.interface.js';
 import { Logger } from '../../logger/index.js';
 import { Route } from '../types/route.interface.js';
 import asyncHandler from 'express-async-handler';
+import {HttpMethod} from '../types/http-method.enum.js';
 
 const DEFAULT_CONTENT_TYPE = 'application/json';
 
@@ -22,15 +23,35 @@ export abstract class BaseController implements Controller {
     return this._router;
   }
 
-  public addRoute(this: BaseController, route: Route) {
-    const routeHandler = asyncHandler(route.handler.bind(this));
+  public addRoute(route: Route) {
     const middlewareHandlers = route.middlewares?.map(
-      (item) => asyncHandler(item.execute.bind(item))
+      (item) => asyncHandler(item.handleAsync.bind(item))
     );
-    const allHandlers = middlewareHandlers ? [...middlewareHandlers, routeHandler] : routeHandler;
+    const wrappedHandler = asyncHandler(route.handler.bind(route));
 
-    this._router[route.method](route.path, allHandlers);
-    this.logger.info(`Route registered: ${route.method.toUpperCase()} ${route.path}`);
+    const allHandlers = middlewareHandlers ? [...middlewareHandlers, wrappedHandler] : [wrappedHandler];
+
+    for (const handler of allHandlers) {
+      switch (route.method) {
+        case HttpMethod.Get:
+          this.router.get(route.path, async (res, req, next) => await handler(res, req, next));
+          break;
+        case HttpMethod.Post:
+          this.router.post(route.path, async (res, req, next) => await handler(res, req, next));
+          break;
+        case HttpMethod.Delete:
+          this.router.delete(route.path, async (res, req, next) => await handler(res, req, next));
+          break;
+        case HttpMethod.Put:
+          this.router.put(route.path, async (res, req, next) => await handler(res, req, next));
+          break;
+        case HttpMethod.Patch:
+          this.router.patch(route.path, async (res, req, next) => await handler(res, req, next));
+          break;
+      }
+    }
+
+    this.logger.info(`Registered route: ${route.method} ${route.path}`);
   }
 
   public send<T>(res: Response, statusCode: number, data: T): void {
@@ -44,8 +65,8 @@ export abstract class BaseController implements Controller {
     this.send(res, StatusCodes.CREATED, data);
   }
 
-  public noContent<T>(res: Response, data: T): void {
-    this.send(res, StatusCodes.NO_CONTENT, data);
+  public noContent(res: Response): void {
+    this.send(res, StatusCodes.NO_CONTENT, null);
   }
 
   public ok<T>(res: Response, data: T): void {

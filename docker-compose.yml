@@ -1,4 +1,4 @@
-version: "3.9"
+version: '3.9'
 services:
   db:
     image: mongo:4.2
@@ -22,6 +22,8 @@ services:
       ME_CONFIG_MONGODB_ADMINUSERNAME: admin
       ME_CONFIG_MONGODB_ADMINPASSWORD: test
       ME_CONFIG_MONGODB_URL: mongodb://admin:test@db:27017/
+      ME_CONFIG_BASICAUTH_USERNAME: user
+      ME_CONFIG_BASICAUTH_PASSWORD: password
 
 volumes:
   six-cities_data:

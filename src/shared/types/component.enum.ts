@@ -5,12 +5,12 @@ export const Component = {
   DatabaseClient: Symbol.for('DatabaseClient'),
   UserService: Symbol.for('UserService'),
   UserModel: Symbol.for('UserModel'),
+  UserController: Symbol.for('UserController'),
   OfferService: Symbol.for('OfferService'),
   OfferModel: Symbol.for('OfferModel'),
+  OfferController: Symbol.for('OfferController'),
   CommentService: Symbol.for('CommentService'),
   CommentModel: Symbol.for('CommentModel'),
-  UserController: Symbol.for('UserController'),
-  OfferController: Symbol.for('OfferController'),
   CommentController: Symbol.for('CommentController'),
-  ExceptionFilter: Symbol.for('ExceptionFilter')
+  ExeptionFilter: Symbol.for('ExeptionFilter'),
 } as const;
