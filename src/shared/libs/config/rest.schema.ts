@@ -4,6 +4,7 @@ import validator from 'convict-format-with-validator';
 convict.addFormats(validator);
 
 export type RestSchema = {
+  HOST: string,
   PORT: number;
   SALT: string;
   DB_HOST: string;
@@ -16,6 +17,12 @@ export type RestSchema = {
 };
 
 export const configRestSchema = convict<RestSchema>({
+  HOST: {
+    doc: 'Host for incoming connections',
+    format: 'url',
+    env: 'HOST',
+    default: 'http://localhost:4000'
+  },
   PORT: {
     doc: 'Port for incoming connections',
     format: 'port',

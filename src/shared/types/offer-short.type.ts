@@ -1,6 +1,5 @@
 import {City, HousingType} from './offer.types.js';
 
-
 export type OfferShort = {
   id: string,
   name: string;

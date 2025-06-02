@@ -7,7 +7,7 @@ import {Types} from 'mongoose';
 import { CheckIdService } from '../../libs/rest/types/check-id-service.interface.js';
 
 export interface OfferService extends CheckIdService {
-  create(dto: CreateOfferDto): Promise<DocumentType<OfferEntity>>;
+  create(dto: CreateOfferDto, userId: string): Promise<DocumentType<OfferEntity>>;
   change(id: Types.ObjectId, dto: PutOfferDto): Promise<DocumentType<OfferEntity> | null>;
   deleteById(id: Types.ObjectId): Promise<void>;
   findById(id: Types.ObjectId): Promise<DocumentType<OfferEntity> | null>;

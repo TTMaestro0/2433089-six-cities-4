@@ -13,7 +13,7 @@ import { createUserDtoSchema } from './dto-schemas/create-user-dto.schema.js';
 import {UploadFileMiddleware} from '../../libs/rest/middleware/upload-file.middleware.js';
 import {StatusCodes} from 'http-status-codes';
 import {LoginDto} from './dto/login.dto.js';
-import {getToken} from '../../helpers/jwt-tokens.js';
+import {getToken} from '../../helpers/index.js';
 import {toFullModel} from './converters.js';
 
 @injectable()
@@ -32,7 +32,7 @@ export class UserController extends BaseController {
       method: HttpMethod.Get,
       handler: this.me.bind(this),
       middlewares: [
-        new AuthorizeMiddleware(this.config.get('JWT_SECRET'))
+        new AuthorizeMiddleware(this.config.get('JWT_SECRET'), false)
       ]
     });
     this.addRoute({
@@ -41,7 +41,7 @@ export class UserController extends BaseController {
       handler: this.loadAvatar.bind(this),
       middlewares: [
 
-        new AuthorizeMiddleware(this.config.get('JWT_SECRET')),
+        new AuthorizeMiddleware(this.config.get('JWT_SECRET'), false),
         new UploadFileMiddleware(this.config.get('STATIC_ROOT'), 'avatar')
       ]
     });
@@ -51,6 +51,7 @@ export class UserController extends BaseController {
     const { userId } = res.locals;
 
     const filepath = req.file?.path;
+    this.logger.info(`Avatar loaded path: ${filepath}`);
     if (!filepath) {
       throw new HttpError(StatusCodes.INTERNAL_SERVER_ERROR, 'Avatar not loaded');
     }
@@ -67,7 +68,7 @@ export class UserController extends BaseController {
       dto.avatar = avatarPath;
     }
     const user = await this.userService.create(dto, this.config.get('SALT'));
-    this.created(res, this.created(res, toFullModel(user)));
+    this.created(res, toFullModel(user, this.config.get('HOST')));
   }
 
   private async login(req: Request, res: Response): Promise<void> {
@@ -92,6 +93,6 @@ export class UserController extends BaseController {
       return;
     }
 
-    this.ok(res, toFullModel(user));
+    this.ok(res, toFullModel(user, this.config.get('HOST')));
   }
 }

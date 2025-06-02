@@ -10,7 +10,7 @@ import {
   City,
   ConvenienceType,
   HousingType,
-  MockServerData,
+  MockServerData, UserType,
 } from '../../types/index.js';
 import { OfferTsvParser } from './index.js';
 import { OfferGenerator } from './offer-generator.interface.js';
@@ -72,7 +72,13 @@ export class TsvOfferGenerator implements OfferGenerator {
       guests: generateRandomValue(MIN_GUESTS, MAX_GUESTS),
       cost: generateRandomValue(MIN_COST, MAX_COST, 2),
       conveniences: getRandomEnumValues(ConvenienceType),
-      author: author,
+      author: {
+        id: `${generateRandomValue(0, 100000)}`,
+        name: author,
+        email: `${author}${generateRandomValue(0, 100000)}@fakemail.ru`,
+        type: getRandomEnumValue(UserType),
+        avatar: `https://six-cities.ru/images/${generateRandomValue(0, 100000)}/user`
+      },
       latitude: generateRandomValue(MIN_LATITUDE, MAX_LATITUDE, 6),
       longitude: generateRandomValue(MIN_LONGITUDE, MAX_LONGITUDE, 6),
       commentsNumber: 0,

@@ -35,6 +35,6 @@ export class DefaultCommentService implements CommentService {
   }
 
   public async findAllForOffer(offerId: string, limit: number, skip: number): Promise<DocumentType<CommentEntity>[]> {
-    return await this.commentModel.find({offerId: {$eq: offerId}}).skip(skip).limit(limit).exec();
+    return await this.commentModel.find({offerId: {$eq: offerId}}).populate('authorId').skip(skip).limit(limit).exec();
   }
 }

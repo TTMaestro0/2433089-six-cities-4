@@ -1,3 +1,5 @@
+import {User} from './user.types.js';
+
 export enum City {
   Paris = 'Paris',
   Cologne = 'Colonge',
@@ -45,7 +47,7 @@ export type Offer = {
   guests: number;
   cost: number;
   conveniences: ConvenienceType[];
-  author: string;
+  author: User;
   latitude: number;
   longitude: number;
   commentsNumber: number;

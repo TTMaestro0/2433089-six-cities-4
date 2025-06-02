@@ -2,8 +2,9 @@ import {
   City,
   ConvenienceType,
   HousingType,
-  Offer,
+  Offer, UserType,
 } from '../../types/index.js';
+import {generateRandomValue} from '../../helpers/index.js';
 
 export class OfferTsvParser {
   constructor() {}
@@ -55,7 +56,13 @@ export class OfferTsvParser {
       conveniences: conveniences
         .split(';')
         .map((convenience) => convenience as ConvenienceType),
-      author: author,
+      author: {
+        id: `${generateRandomValue(0, 100000)}`,
+        name: author,
+        email: `${author}${generateRandomValue(0, 100000)}@fakemail.ru`,
+        type: UserType.Basic,
+        avatar: `https://six-cities.ru/images/${generateRandomValue(0, 100000)}/user`
+      },
       latitude: Number(latitude),
       longitude: Number(longitude),
       commentsNumber: 0,

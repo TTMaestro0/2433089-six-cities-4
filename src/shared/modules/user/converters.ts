@@ -3,11 +3,11 @@ import {UserEntity} from './user.entity.js';
 import {User} from '../../types/index.js';
 
 
-export function toFullModel(dbModel: DocumentType<UserEntity>): User {
+export function toFullModel(dbModel: DocumentType<UserEntity>, host: string): User {
   return {
-    id: String(dbModel._id),
+    id: dbModel._id.toString(),
     name: dbModel.name,
-    avatar: dbModel.avatar,
+    avatar: `${host}/${dbModel.avatar}`,
     type: dbModel.type,
     email: dbModel.email
   };

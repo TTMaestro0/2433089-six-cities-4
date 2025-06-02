@@ -1,6 +1,6 @@
 import {defaultClasses, getModelForClass, modelOptions, prop, Ref} from '@typegoose/typegoose';
-import { OfferEntity } from '../offer/offer.entity.js';
-import { UserEntity } from '../user/user.entity.js';
+import { OfferEntity } from '../offer/index.js';
+import { UserEntity } from '../user/index.js';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export interface CommentEntity extends defaultClasses.Base {}
