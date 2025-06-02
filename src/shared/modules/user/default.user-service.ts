@@ -1,9 +1,9 @@
 import { DocumentType, types } from '@typegoose/typegoose';
 import { inject, injectable } from 'inversify';
-import { ObjectId, Types } from 'mongoose';
+import { Types } from 'mongoose';
 import 'reflect-metadata';
 import { Logger } from '../../libs/logger/index.js';
-import { Component } from '../../types/component.enum.js';
+import { Component } from '../../types/index.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { UserService } from './user-service.interface.js';
 import { UserEntity } from './user.entity.js';
@@ -36,7 +36,7 @@ export class DefaultUserService implements UserService {
   }
 
   public async findById(
-    id: ObjectId
+    id: Types.ObjectId
   ): Promise<DocumentType<UserEntity> | null> {
     return this.userModel.findById(id);
   }
@@ -77,7 +77,7 @@ export class DefaultUserService implements UserService {
     return user;
   }
 
-  public async updateAvatar(id: ObjectId, avatarPath: string): Promise<void> {
-    await this.userModel.updateOne({ id: id }, { avatarUrl: avatarPath });
+  public async updateAvatar(id: Types.ObjectId, avatarPath: string): Promise<void> {
+    await this.userModel.findByIdAndUpdate(id, { avatar: avatarPath }).exec();
   }
 }

@@ -14,19 +14,24 @@ import {
 import { Offer } from '../../shared/types/index.js';
 import { ICommand } from './command.interface.js';
 import {CommentModel} from '../../shared/modules/comment/index.js';
+import {DefaultUserService, UserModel, UserService} from '../../shared/modules/user/index.js';
 
 export class ImportCommand implements ICommand {
   private readonly parser: OfferTsvParser = new OfferTsvParser();
   private readonly offerService: OfferService;
+  private readonly userService: UserService;
   private readonly databaseClient: DatabaseClient;
   private readonly logger: Logger;
+  private salt: string;
 
   constructor() {
     this.onImportedLine = this.onImportedLine.bind(this);
     this.onCompleteImport = this.onCompleteImport.bind(this);
+    this.saveOffer = this.saveOffer.bind(this);
 
     this.logger = new ConsoleLogger();
     this.offerService = new DefaultOfferService(this.logger, OfferModel, CommentModel);
+    this.userService = new DefaultUserService(this.logger, UserModel);
     this.databaseClient = new MongoDatabaseClient(this.logger);
   }
 
@@ -36,8 +41,10 @@ export class ImportCommand implements ICommand {
 
   public async execute(
     filename: string,
-    databaseConnectionUri: string
+    databaseConnectionUri: string,
+    salt: string,
   ): Promise<void> {
+    this.salt = salt;
 
     await this.databaseClient.connect(databaseConnectionUri);
     const reader = new TsvFileReader(filename.trim());
@@ -69,6 +76,13 @@ export class ImportCommand implements ICommand {
 
   private async saveOffer(offer: Offer) {
 
+    const result = await this.userService.create({
+      email: offer.author.email,
+      password: '1234567890',
+      type: offer.author.type,
+      name: offer.author.name
+    }, this.salt);
+
     await this.offerService.create({
       name: offer.name,
       description: offer.description,
@@ -81,9 +95,8 @@ export class ImportCommand implements ICommand {
       guests: offer.guests,
       cost: offer.cost,
       conveniences: offer.conveniences,
-      authorId: offer.author,
       latitude: offer.latitude,
       longitude: offer.longitude,
-    });
+    }, result.id);
   }
 }

@@ -10,33 +10,35 @@ import { PutOfferDto } from './dto/put-offer.dto.js';
 import { isValidObjectId, Types } from 'mongoose';
 import {HttpError, HttpMethod} from '../../libs/rest/index.js';
 import { StatusCodes } from 'http-status-codes';
-import { ObjectIdValidatorMiddleware } from '../../libs/rest/middleware/object-id-validator.middleware.js';
+import { ObjectIdValidatorMiddleware } from '../../libs/rest/index.js';
 import { SchemaValidatorMiddleware } from '../../libs/rest/middleware/schema-validator.middleware.js';
 import { createOfferDtoSchema } from './dto-schemas/create-offer-dto.schema.js';
 import { putOfferDtoSchema } from './dto-schemas/put-offer-dto.schems.js';
-import { Config } from '../../libs/config/config.interface.js';
-import { RestSchema } from '../../libs/config/rest.schema.js';
-import {toFullModel, toShortModel} from './converters.js';
+import { Config } from '../../libs/config/index.js';
+import { RestSchema } from '../../libs/config/index.js';
+import {toFullModel} from './converters.js';
+import {UserService} from '../user/index.js';
 
 @injectable()
 export class OfferController extends BaseController {
   constructor(
     @inject(Component.Logger) logger: Logger,
     @inject(Component.OfferService) private offerService: OfferService,
+    @inject(Component.UserService) private userService: UserService,
     @inject(Component.Config) private readonly config: Config<RestSchema>,
   ) {
     super(logger);
-    this.addRoute({path: '/premium/:city', method: HttpMethod.Get, handler: this.indexPremiumForCity.bind(this)});
+    this.addRoute({path: '/premium/:city', method: HttpMethod.Get, handler: this.indexPremiumForCity.bind(this), middlewares: [new AuthorizeMiddleware(this.config.get('JWT_SECRET'), true)]});
 
-    this.addRoute({path: '/favourite', method: HttpMethod.Get, handler: this.indexFavouriteForUser.bind(this), middlewares: [new AuthorizeMiddleware(this.config.get('JWT_SECRET'))]});
-    this.addRoute({path: '/favourite/:id', method: HttpMethod.Post, handler: this.addToFavourite.bind(this), middlewares: [new ObjectIdValidatorMiddleware(this.offerService, 'id'), new AuthorizeMiddleware(this.config.get('JWT_SECRET'))]});
-    this.addRoute({path: '/favourite/:id', method: HttpMethod.Delete, handler: this.removeFromFavourite.bind(this), middlewares: [new ObjectIdValidatorMiddleware(this.offerService, 'id'), new AuthorizeMiddleware(this.config.get('JWT_SECRET'))]});
+    this.addRoute({path: '/favourite', method: HttpMethod.Get, handler: this.indexFavouriteForUser.bind(this), middlewares: [new AuthorizeMiddleware(this.config.get('JWT_SECRET'), false)]});
+    this.addRoute({path: '/favourite/:id', method: HttpMethod.Post, handler: this.addToFavourite.bind(this), middlewares: [new ObjectIdValidatorMiddleware(this.offerService, 'id'), new AuthorizeMiddleware(this.config.get('JWT_SECRET'), false)]});
+    this.addRoute({path: '/favourite/:id', method: HttpMethod.Delete, handler: this.removeFromFavourite.bind(this), middlewares: [new ObjectIdValidatorMiddleware(this.offerService, 'id'), new AuthorizeMiddleware(this.config.get('JWT_SECRET'), false)]});
 
-    this.addRoute({path: '/', method: HttpMethod.Get, handler: this.index.bind(this)});
-    this.addRoute({path: '/', method: HttpMethod.Post, handler: this.create.bind(this), middlewares: [new SchemaValidatorMiddleware(createOfferDtoSchema), new AuthorizeMiddleware(this.config.get('JWT_SECRET'))]});
-    this.addRoute({path: '/:id', method: HttpMethod.Get, handler: this.showById.bind(this), middlewares: [new ObjectIdValidatorMiddleware(this.offerService, 'id')]});
-    this.addRoute({path: '/:id', method: HttpMethod.Put, handler: this.updateById.bind(this), middlewares: [new AuthorizeMiddleware(this.config.get('JWT_SECRET')), new SchemaValidatorMiddleware(putOfferDtoSchema), new ObjectIdValidatorMiddleware(this.offerService, 'id')]});
-    this.addRoute({path: '/:id', method: HttpMethod.Delete, handler: this.deleteById.bind(this), middlewares: [new ObjectIdValidatorMiddleware(this.offerService, 'id'), new AuthorizeMiddleware(this.config.get('JWT_SECRET'))]});
+    this.addRoute({path: '/', method: HttpMethod.Get, handler: this.index.bind(this), middlewares: [new AuthorizeMiddleware(this.config.get('JWT_SECRET'), true)]});
+    this.addRoute({path: '/', method: HttpMethod.Post, handler: this.create.bind(this), middlewares: [new SchemaValidatorMiddleware(createOfferDtoSchema), new AuthorizeMiddleware(this.config.get('JWT_SECRET'),false)]});
+    this.addRoute({path: '/:id', method: HttpMethod.Get, handler: this.showById.bind(this), middlewares: [new AuthorizeMiddleware(this.config.get('JWT_SECRET'), true), new ObjectIdValidatorMiddleware(this.offerService, 'id')]});
+    this.addRoute({path: '/:id', method: HttpMethod.Put, handler: this.updateById.bind(this), middlewares: [new AuthorizeMiddleware(this.config.get('JWT_SECRET'), false), new SchemaValidatorMiddleware(putOfferDtoSchema), new ObjectIdValidatorMiddleware(this.offerService, 'id')]});
+    this.addRoute({path: '/:id', method: HttpMethod.Delete, handler: this.deleteById.bind(this), middlewares: [new ObjectIdValidatorMiddleware(this.offerService, 'id'), new AuthorizeMiddleware(this.config.get('JWT_SECRET'), false)]});
   }
 
   private async index(req: Request, res: Response): Promise<void> {
@@ -58,15 +60,23 @@ export class OfferController extends BaseController {
     }
 
     const offers = await this.offerService.findAll(limitValue, skipValue);
-    this.ok(res, offers.map((o) => toShortModel(o, userId)));
+    const mappedResult = [];
+
+    for (const offer of offers) {
+      const author = await this.userService.findById(new Types.ObjectId(offer.authorId.toString()));
+      mappedResult.push(toFullModel(offer, userId, author!, this.config.get('HOST')));
+    }
+
+    this.ok(res, mappedResult);
   }
 
   private async create(req: Request, res: Response): Promise<void> {
     const { userId } = res.locals;
     const dto = plainToClass(CreateOfferDto, req.body);
-    dto.authorId = userId;
-    const offer = await this.offerService.create(dto);
-    this.created(res, toFullModel(offer, userId));
+    const offer = await this.offerService.create(dto, userId);
+    const user = await this.userService.findById(new Types.ObjectId(String(userId)));
+
+    this.created(res, toFullModel(offer, userId, user!, this.config.get('HOST')));
   }
 
   private async showById(req: Request, res: Response): Promise<void> {
@@ -80,7 +90,9 @@ export class OfferController extends BaseController {
       return;
     }
 
-    this.ok(res, toFullModel(offer, userId));
+    const author = await this.userService.findById(new Types.ObjectId(offer.authorId.toString()));
+
+    this.ok(res, toFullModel(offer, userId, author!, this.config.get('HOST')));
   }
 
   private async updateById(req: Request, res: Response): Promise<void> {
@@ -102,7 +114,8 @@ export class OfferController extends BaseController {
       return;
     }
 
-    this.ok(res, toFullModel(offer, userId));
+    const user = await this.userService.findById(new Types.ObjectId(String(userId)));
+    this.ok(res, toFullModel(offer, userId, user!, this.config.get('HOST')));
   }
 
   private async deleteById(req: Request, res: Response): Promise<void> {
@@ -146,7 +159,14 @@ export class OfferController extends BaseController {
     }
 
     const offers = await this.offerService.findAllPremium(cityValue, limitValue, skipValue);
-    this.ok(res, offers.map((o) => toShortModel(o, userId)));
+    const mappedResult = [];
+
+    for (const offer of offers) {
+      const author = await this.userService.findById(new Types.ObjectId(offer.authorId.toString()));
+      mappedResult.push(toFullModel(offer, userId, author!, this.config.get('HOST')));
+    }
+
+    this.ok(res, mappedResult);
   }
 
   private async indexFavouriteForUser(req: Request, res: Response): Promise<void> {
@@ -169,7 +189,14 @@ export class OfferController extends BaseController {
     const { userId } = res.locals;
 
     const offers = await this.offerService.findAllFavourite(userId, limitValue, skipValue);
-    this.ok(res, offers);
+    const mappedResult = [];
+
+    for (const offer of offers) {
+      const author = await this.userService.findById(new Types.ObjectId(offer.authorId.toString()));
+      mappedResult.push(toFullModel(offer, userId, author!, this.config.get('HOST')));
+    }
+
+    this.ok(res, mappedResult);
   }
 
   private async addToFavourite(req: Request, res: Response): Promise<void> {

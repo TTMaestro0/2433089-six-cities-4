@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { isValidObjectId, Types } from 'mongoose';
 import { StatusCodes } from 'http-status-codes';
 import { Middleware } from '../types/middleware.interface.js';
-import { HttpError } from '../errors/http-error.js';
+import { HttpError } from '../errors/index.js';
 import { CheckIdService } from '../types/check-id-service.interface.js';
 
 export class ObjectIdValidatorMiddleware implements Middleware {

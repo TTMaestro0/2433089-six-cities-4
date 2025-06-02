@@ -6,13 +6,18 @@ import { jwtVerify } from 'jose';
 
 export class AuthorizeMiddleware implements Middleware {
   constructor(
-    private readonly jwtSecret: string
+    private readonly jwtSecret: string,
+    private readonly allowAnonymous: boolean
   ) {}
 
   public async handleAsync(req: Request, res: Response, next: NextFunction): Promise<void> {
     const authorizationHeader = req.headers.authorization;
 
     if (!authorizationHeader) {
+      if (this.allowAnonymous) {
+        next();
+        return;
+      }
       throw new HttpError(StatusCodes.UNAUTHORIZED, 'Authorization token is empty');
     }
 

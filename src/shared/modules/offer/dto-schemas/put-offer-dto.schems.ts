@@ -1,12 +1,7 @@
 import Joi from 'joi';
 import { HousingType, ConvenienceType, City } from '../../../types/index.js';
-import { Types } from 'mongoose';
 
 export const putOfferDtoSchema = Joi.object({
-  id: Joi.string().required().custom((value, helpers) => {
-    const filtered = Types.ObjectId.isValid(value);
-    return !filtered ? helpers.error('any.invalid') : value;
-  }, 'invalid objectId'),
   name: Joi.string().min(10).max(100).required(),
   description: Joi.string().min(20).max(1024).required(),
   city: Joi.string().valid(...Object.values(City)).required(),

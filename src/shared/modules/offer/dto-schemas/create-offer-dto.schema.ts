@@ -1,6 +1,5 @@
 import Joi from 'joi';
 import { HousingType, ConvenienceType, City } from '../../../types/index.js';
-import { Types } from 'mongoose';
 
 export const createOfferDtoSchema = Joi.object({
   name: Joi.string().min(10).max(100).required(),
@@ -14,10 +13,6 @@ export const createOfferDtoSchema = Joi.object({
   guestsNumber: Joi.number().min(1).max(10).required(),
   cost: Joi.number().min(100).max(100000).required(),
   conveniences: Joi.array().items(Joi.string().valid(...Object.values(ConvenienceType))).required(),
-  authorId: Joi.string().custom((value, helpers) => {
-    const filtered = Types.ObjectId.isValid(value);
-    return !filtered ? helpers.error('any.invalid') : value;
-  }, 'invalid objectId'),
   latitude: Joi.number().min(-90).max(90).required(),
   longitude: Joi.number().min(-180).max(180).required()
 });

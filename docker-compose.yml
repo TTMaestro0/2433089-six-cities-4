@@ -1,5 +1,19 @@
-version: '3.9'
+version: "3.9"
 services:
+  api:
+    build:
+      dockerfile:  Dockerfile
+      context: .
+    restart: always
+    container_name: six-cities_api
+    environment:
+      - .env
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+    volumes:
+      - six-cities_data:/data/api
   db:
     image: mongo:4.2
     restart: always
@@ -11,7 +25,6 @@ services:
       - 27017:27017
     volumes:
       - six-cities_data:/data/db
-
   db_ui:
     image: mongo-express:latest
     restart: always

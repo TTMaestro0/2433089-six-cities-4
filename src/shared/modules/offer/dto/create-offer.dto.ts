@@ -13,7 +13,6 @@ export class CreateOfferDto {
   public guests: number;
   public cost: number;
   public conveniences: ConvenienceType[];
-  public authorId: string;
   public latitude: number;
   public longitude: number;
 }

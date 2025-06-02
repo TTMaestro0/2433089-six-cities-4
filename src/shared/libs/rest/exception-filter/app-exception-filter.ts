@@ -1,39 +1,26 @@
 import { inject, injectable } from 'inversify';
-import { StatusCodes } from 'http-status-codes';
-import { NextFunction, Request, Response } from 'express';
 import { ExceptionFilter } from './exception-filter.interface.js';
-import { Logger } from '../../logger/index.js';
-import { Component } from '../../../types/index.js';
-import { createErrorObject } from '../../../helpers/index.js';
-import { HttpError } from '../errors/index.js';
+import { Request, Response, NextFunction } from 'express';
+import {Component} from '../../../types/index.js';
+import pino from 'pino';
+import Logger = pino.Logger;
+import {HttpError} from '../errors/index.js';
+import {StatusCodes} from 'http-status-codes';
 
 @injectable()
-export class AppExceptionFilter implements ExceptionFilter {
+export class LoggingExceptionFilter implements ExceptionFilter {
   constructor(
-    @inject(Component.Logger) private readonly logger: Logger
-  ) {
-    this.logger.info('Register AppExceptionFilter');
-  }
+    @inject(Component.Logger) private logger: Logger
+  ) {}
 
-  private handleHttpError(error: HttpError, _req: Request, res: Response, _next: NextFunction) {
-    this.logger.error(`[${error.detail}]: ${error.httpStatusCode} — ${error.message}`, error);
-    res
-      .status(error.httpStatusCode)
-      .json(createErrorObject(error.message));
-  }
-
-  private handleOtherError(error: Error, _req: Request, res: Response, _next: NextFunction) {
-    this.logger.error(error.message, error);
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json(createErrorObject(error.message));
-  }
-
-  public catch(error: Error | HttpError, req: Request, res: Response, next: NextFunction): void {
-    if (error instanceof HttpError) {
-      return this.handleHttpError(error, req, res, next);
+  handle(err: Error, _req: Request, res: Response, _next: NextFunction): void {
+    if (err instanceof HttpError) {
+      res.statusCode = err.httpStatusCode;
+      res.send({error: err.message, detail: err.detail});
     }
 
-    this.handleOtherError(error, req, res, next);
+    this.logger.error(err.message, err);
+    res.statusCode = StatusCodes.INTERNAL_SERVER_ERROR;
+    res.send({error: err.message});
   }
 }
