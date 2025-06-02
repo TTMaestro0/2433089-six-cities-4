@@ -1,58 +1,42 @@
-import { createSHA256 } from '../../helpers/hash.js';
-import { User, UserType } from '../../types/index.js';
-import { defaultClasses, getModelForClass, modelOptions, prop } from '@typegoose/typegoose';
+import {
+  defaultClasses,
+  getModelForClass,
+  modelOptions,
+  prop,
+} from '@typegoose/typegoose';
+import { createSHA256 } from '../../helpers/index.js';
+import { UserType } from '../../types/index.js';
+import {CreateUserDto} from './dto/create-user.dto.js';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
-export interface UserEntity extends defaultClasses.Base { }
+export interface UserEntity extends defaultClasses.Base {}
 
 @modelOptions({
   schemaOptions: {
     collection: 'users',
-    timestamps: true
-  }
+    timestamps: true,
+  },
 })
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
-export class UserEntity extends defaultClasses.TimeStamps implements User {
-  @prop({
-    required: true,
-    minlength: [1, 'Min length for name is 1'],
-    maxlength: [15, 'Max length for name is 15']
-  })
-  public name: string;
+export class UserEntity extends defaultClasses.TimeStamps {
+  @prop({ required: true })
+  public name: string = '';
 
-  @prop({
-    unique: true,
-    required: true,
-    match: [/^.+@.+$/, 'Email is incorrect']
-  })
-  public email: string;
+  @prop({ required: true, unique: true })
+  public email: string = '';
 
-  @prop({
-    required: false,
-    default: '',
-    match: [/.*\.(?:jpg|png)/, 'Avatar must be jpg or png']
-  })
-  public avatar?: string;
+  @prop({ required: true })
+  public password?: string = '';
 
-  @prop({
-    required: false,
-    default: UserType.Common,
-    type: () => String,
-    enum: UserType
-  })
-  public type: string;
+  @prop({ required: true })
+  public type: UserType = UserType.Basic;
 
-  public favoriteOffers!: string[];
+  @prop({ required: false, default: null })
+  public avatar?: string = '';
 
-  @prop({
-    required: true,
-    minlength: [6, 'Min length for password is 6'],
-    //maxlength: [12, 'Max length for password is 12'], TODO: delete
-  })
-  private password?: string;
-
-  constructor(userData: User) {
+  constructor(userData: CreateUserDto) {
     super();
+
     this.email = userData.email;
     this.avatar = userData.avatar;
     this.name = userData.name;
@@ -65,11 +49,6 @@ export class UserEntity extends defaultClasses.TimeStamps implements User {
 
   public getPassword() {
     return this.password;
-  }
-
-  public verifyPassword(password: string, salt: string) {
-    const hashPassword = createSHA256(password, salt);
-    return hashPassword === this.password;
   }
 }
 

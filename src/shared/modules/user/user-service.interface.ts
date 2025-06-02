@@ -1,13 +1,17 @@
 import { DocumentType } from '@typegoose/typegoose';
-import { UserEntity } from './user.entity.js';
+import { ObjectId } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto.js';
-import { OfferEntity } from '../offer/offer.entity.js';
-import { LoginUserDto } from './dto/login-user.dto.js';
+import { UserEntity } from './user.entity.js';
+import { CheckIdService } from '../../libs/rest/types/check-id-service.interface.js';
 
-export interface UserService {
+export interface UserService extends CheckIdService{
   create(dto: CreateUserDto, salt: string): Promise<DocumentType<UserEntity>>;
+  findById(id: ObjectId): Promise<DocumentType<UserEntity> | null>;
   findByEmail(email: string): Promise<DocumentType<UserEntity> | null>;
-  findOrCreate(dto: CreateUserDto, salt: string): Promise<DocumentType<UserEntity>>;
-  findFavoriteOffers(userId: string): Promise<DocumentType<OfferEntity>[]>;
-  verifyUser(dto: LoginUserDto, salt: string): Promise<DocumentType<UserEntity> | null>;
+  findOrCreate(
+    dto: CreateUserDto,
+    salt: string
+  ): Promise<DocumentType<UserEntity>>;
+  checkPassword(email: string, password: string, salt: string): Promise<DocumentType<UserEntity> | null>;
+  updateAvatar(id: ObjectId, avatarPath: string): Promise<void>;
 }

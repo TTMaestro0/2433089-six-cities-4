@@ -1,11 +1,11 @@
 import { inject, injectable } from 'inversify';
 import { StatusCodes } from 'http-status-codes';
 import { NextFunction, Request, Response } from 'express';
-import { HttpError } from '../errors/http-error.js';
 import { ExceptionFilter } from './exception-filter.interface.js';
-import { Component } from '../../../types/component.enum.js';
-import { Logger } from '../../logger/logger.interface.js';
-import { createErrorObject } from '../../../helpers/common.js';
+import { Logger } from '../../logger/index.js';
+import { Component } from '../../../types/index.js';
+import { createErrorObject } from '../../../helpers/index.js';
+import { HttpError } from '../errors/index.js';
 
 @injectable()
 export class AppExceptionFilter implements ExceptionFilter {
@@ -33,6 +33,7 @@ export class AppExceptionFilter implements ExceptionFilter {
     if (error instanceof HttpError) {
       return this.handleHttpError(error, req, res, next);
     }
+
     this.handleOtherError(error, req, res, next);
   }
 }

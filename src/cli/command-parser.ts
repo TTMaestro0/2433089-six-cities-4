@@ -1,19 +1,19 @@
-type ParserCommand = Record<string, string[]>;
+type ParsedCommand = Record<string, string[]>
 
 export class CommandParser {
-  static parse(cliArguments: string[]): ParserCommand {
-    const parserCommand: ParserCommand = {};
+  static parse(cliArguments: string[]): ParsedCommand {
+    const parsedCommand: ParsedCommand = {};
     let currentCommand = '';
 
     for (const argument of cliArguments) {
       if (argument.startsWith('--')) {
-        parserCommand[argument] = [];
+        parsedCommand[argument] = [];
         currentCommand = argument;
       } else if (currentCommand && argument) {
-        parserCommand[currentCommand].push(argument);
+        parsedCommand[currentCommand].push(argument);
       }
     }
 
-    return parserCommand;
+    return parsedCommand;
   }
 }

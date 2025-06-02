@@ -1,4 +1,4 @@
 export interface DatabaseClient {
-  connect(url: string): Promise<void>;
+  connect(uri: string): Promise<void>;
   disconnect(): Promise<void>;
 }
